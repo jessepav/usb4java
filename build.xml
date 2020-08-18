@@ -154,11 +154,22 @@
   
   <target name="init.artifacts">
     <property name="artifacts.temp.dir" value="${basedir}/__artifacts_temp"/>
+    <property name="artifact.output.docjar" value="${basedir}/build/artifacts/jars"/>
     <property name="artifact.output.jar" value="${basedir}/build/artifacts/jars"/>
     <property name="artifact.output.srcjar" value="${basedir}/build/artifacts/jars"/>
     <mkdir dir="${artifacts.temp.dir}"/>
+    <property name="temp.jar.path.usb4java-1.3.0-JP-javadoc.jar" value="${artifacts.temp.dir}/usb4java-1.3.0-JP-javadoc.jar"/>
     <property name="temp.jar.path.usb4java-1.3.0-JP.jar" value="${artifacts.temp.dir}/usb4java-1.3.0-JP.jar"/>
-    <property name="temp.jar.path.usb4java-1.3.0-JP-src.jar" value="${artifacts.temp.dir}/usb4java-1.3.0-JP-src.jar"/>
+    <property name="temp.jar.path.usb4java-1.3.0-JP-sources.jar" value="${artifacts.temp.dir}/usb4java-1.3.0-JP-sources.jar"/>
+  </target>
+  
+  <target name="artifact.docjar" depends="init.artifacts" description="Build &#39;docjar&#39; artifact">
+    <property name="artifact.temp.output.docjar" value="${artifacts.temp.dir}/docjar"/>
+    <mkdir dir="${artifact.temp.output.docjar}"/>
+    <jar destfile="${temp.jar.path.usb4java-1.3.0-JP-javadoc.jar}" duplicate="preserve" filesetmanifest="mergewithoutmain">
+      <zipfileset dir="${basedir}/javadoc"/>
+    </jar>
+    <copy file="${temp.jar.path.usb4java-1.3.0-JP-javadoc.jar}" tofile="${artifact.temp.output.docjar}/usb4java-1.3.0-JP-javadoc.jar"/>
   </target>
   
   <target name="artifact.jar" depends="init.artifacts, compile.module.usb4java" description="Build &#39;jar&#39; artifact">
@@ -173,13 +184,17 @@
   <target name="artifact.srcjar" depends="init.artifacts" description="Build &#39;srcjar&#39; artifact">
     <property name="artifact.temp.output.srcjar" value="${artifacts.temp.dir}/srcjar"/>
     <mkdir dir="${artifact.temp.output.srcjar}"/>
-    <jar destfile="${temp.jar.path.usb4java-1.3.0-JP-src.jar}" duplicate="preserve" filesetmanifest="mergewithoutmain">
+    <jar destfile="${temp.jar.path.usb4java-1.3.0-JP-sources.jar}" duplicate="preserve" filesetmanifest="mergewithoutmain">
       <zipfileset dir="${basedir}/src/main/java"/>
     </jar>
-    <copy file="${temp.jar.path.usb4java-1.3.0-JP-src.jar}" tofile="${artifact.temp.output.srcjar}/usb4java-1.3.0-JP-src.jar"/>
+    <copy file="${temp.jar.path.usb4java-1.3.0-JP-sources.jar}" tofile="${artifact.temp.output.srcjar}/usb4java-1.3.0-JP-sources.jar"/>
   </target>
   
-  <target name="build.all.artifacts" depends="artifact.jar, artifact.srcjar" description="Build all artifacts">
+  <target name="build.all.artifacts" depends="artifact.docjar, artifact.jar, artifact.srcjar" description="Build all artifacts">
+    <mkdir dir="${artifact.output.docjar}"/>
+    <copy todir="${artifact.output.docjar}">
+      <fileset dir="${artifact.temp.output.docjar}"/>
+    </copy>
     <mkdir dir="${artifact.output.jar}"/>
     <copy todir="${artifact.output.jar}">
       <fileset dir="${artifact.temp.output.jar}"/>
